@@ -1,28 +1,31 @@
-CC = gcc
-flags = -lpthread
-build = ./build/
-src = ./src/
-common = conn.c
+CC     = gcc
+CFLAGS = -Wall -Wextra -std=gnu11 -O2 -pthread
 
-car: 
-	mkdir -p $(build)
-	gcc $(src)car.c $(src)common.c -o $(build)car
+SRC   = src
+BUILD = build
+BINS  = car controller call internal safety
 
-controller:
-	mkdir -p $(build)
-	gcc $(src)controller.c $(src)common.c -o $(build)controller
+all: $(BINS:%=$(BUILD)/%)
 
-call:
-	mkdir -p $(build)
-	gcc $(src)call.c -o $(src)common.c $(build)call
+$(BUILD):
+	mkdir -p $(BUILD)
 
-internal:
-	mkdir -p $(build)
-	gcc $(src)internal.c $(src)common.c -o $(build)internal
+$(BUILD)/car: $(SRC)/car.c $(SRC)/conn.c $(SRC)/car.h $(SRC)/conn.h | $(BUILD)
+	$(CC) $(CFLAGS) -o $@ $(SRC)/car.c $(SRC)/conn.c
 
-safety:
-	mkdir -p $(build)
-	gcc $(src)safety.c $(src)common.c -o $(build)safety
+$(BUILD)/controller: $(SRC)/controller.c $(SRC)/conn.c $(SRC)/conn.h $(SRC)/util.h | $(BUILD)
+	$(CC) $(CFLAGS) -o $@ $(SRC)/controller.c $(SRC)/conn.c
+
+$(BUILD)/call: $(SRC)/call.c $(SRC)/conn.c $(SRC)/conn.h $(SRC)/util.h | $(BUILD)
+	$(CC) $(CFLAGS) -o $@ $(SRC)/call.c $(SRC)/conn.c
+
+$(BUILD)/internal: $(SRC)/internal.c $(SRC)/car.h $(SRC)/util.h | $(BUILD)
+	$(CC) $(CFLAGS) -o $@ $(SRC)/internal.c
+
+$(BUILD)/safety: $(SRC)/safety.c $(SRC)/car.h | $(BUILD)
+	$(CC) $(CFLAGS) -o $@ $(SRC)/safety.c
 
 clean:
-	rm -rf $(build)
+	rm -rf $(BUILD)
+
+.PHONY: all clean

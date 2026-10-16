@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "conn.h"
 
 #include <arpa/inet.h>
@@ -52,8 +53,7 @@ int init_server(void)
     return sockfd;
 }
 
-/* Car: connects to the controller. Returns a connected fd, or -1.
- * Silent on connect failure: the caller retries after `delay` ms. */
+/* Car / hall call: connect to the controller. Returns fd or -1 (silent). */
 int init_client(void)
 {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -101,7 +101,6 @@ static ssize_t write_stream_all(int fd, const void *buf, size_t n)
     return (ssize_t)total;
 }
 
-/* Returns 1 on success, 0 if the peer closed, -1 on error */
 int send_msg(int fd, const char *buf, uint32_t len)
 {
     uint32_t net_len = htonl(len);
@@ -133,7 +132,7 @@ static ssize_t read_stream_all(int fd, void *buf, size_t n)
 }
 
 /* Returns message length (> 0) with buf NUL-terminated,
- * 0 if the peer closed, -1 on error or a bad length. */
+ * 0 if the peer closed, -1 on error or an invalid length. */
 int recv_message(int fd, char *buf, uint32_t bufsize)
 {
     uint32_t net_len;
