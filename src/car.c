@@ -558,12 +558,18 @@ static void deadline_from(sm_t *m, const struct timespec *now)
     add_ns(&m->deadline, (long long)m->md->delay * 1000000LL);
 }
 
-static void set_status(sm_t *m, const char *st, const struct timespec *now)
+/* Changes status without queueing a STATUS report. */
+static void set_status_quiet(sm_t *m, const char *st, const struct timespec *now)
 {
     copy_str(m->shm->status, st, sizeof m->shm->status);
     copy_str(m->seen, st, sizeof m->seen);
     deadline_from(m, now);                 /* every phase lasts one delay */
     m->changed = true;
+}
+
+static void set_status(sm_t *m, const char *st, const struct timespec *now)
+{
+    set_status_quiet(m, st, now);
     net_push(m->net);
 }
 
@@ -597,12 +603,16 @@ static void finish_move(sm_t *m, const struct timespec *now)
     char next[4];
     if (floor_step(s->current_floor, m->move_dir, m->md, next))
         copy_str(s->current_floor, next, sizeof s->current_floor);
-    set_status(m, "Closed", now);
 
-    if (s->service_mode || s->emergency_mode) {   /* stop here, drop all requests */
+    /* Not reported by itself: if the car carries straight on (next floor, or
+     * opening the doors), the controller only sees that next state. */
+    set_status_quiet(m, "Closed", now);
+
+    if (s->service_mode || s->emergency_mode) {   /* the car stops here: report it */
         reset_target(m);
         m->net->has_pending = false;
         m->arrived = false;
+        net_push(m->net);
     } else {
         net_apply_pending(m->net);                /* pending FLOOR becomes visible now */
         m->arrived = str_is(s->status, "Closed") &&
