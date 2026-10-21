@@ -39,7 +39,7 @@ static void ord_to_floor(int o, char out[16])
 }
 
 /* A route is a list of sweeps. Each sweep has a direction and floors sorted
- * monotonically in that direction; every stop in a sweep is serviced in that
+ * monotonically in that direction, every stop in a sweep is serviced in that
  * sweep's direction, so (floor, direction) is implied by (sweep, floor). */
 typedef struct {
     int dir;                      /* +1 up, -1 down */

@@ -27,6 +27,7 @@ static void on_sigint(int sig) { (void)sig; running = 0; }
 
 /* ---------- time helpers ---------- */
 
+// adds time to a timespec
 static void add_ns(struct timespec *t, long long ns)
 {
     t->tv_sec  += (time_t)(ns / 1000000000LL);
@@ -34,12 +35,14 @@ static void add_ns(struct timespec *t, long long ns)
     if (t->tv_nsec >= 1000000000L) { t->tv_nsec -= 1000000000L; t->tv_sec++; }
 }
 
+// checks if one timespec has elapsed the other
 static bool reached(const struct timespec *now, const struct timespec *d)
 {
     return now->tv_sec > d->tv_sec ||
            (now->tv_sec == d->tv_sec && now->tv_nsec >= d->tv_nsec);
 }
 
+// self explanatory
 static void copy_str(char *dst, const char *src, size_t cap)
 {
     strncpy(dst, src, cap - 1);          /* zero-pads, so equal strings compare equal */
@@ -48,7 +51,7 @@ static void copy_str(char *dst, const char *src, size_t cap)
 
 /* ---------- shared memory ---------- */
 
-/* Builds "/cab403_car_{name}", writes it to shm_name */
+// Builds "/cab403_car_{name}", writes it to shm_name 
 static void build_shm_name(char *shm_name, size_t len, const char *name) {
     snprintf(shm_name, len, "/cab403_car_%s", name);
 }
@@ -191,7 +194,7 @@ static bool valid_delay(const char *s, size_t *out)
 
 static int map_args(int v, char **c, car_metadata *metadata)
 {
-    if (v != 5) {
+    if (v != 5) { // for testing 
         fprintf(stderr, "Usage: %s {name} {delay} {lowest floor} {highest floor}\n", c[0]);
         return -1;
     }

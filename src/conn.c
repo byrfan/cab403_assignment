@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+// tbh this is just generic socket spam
 /* Controller: listening socket on loopback:PORT with address reuse. */
 int init_server(void)
 {

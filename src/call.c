@@ -11,7 +11,7 @@
 /* ./call {car name} {floor} {up|down} */
 int main(int argc, char **argv)
 {
-    if (argc != 4) {
+    if (argc != 4) { // testing, could be removed but no matter
         fprintf(stderr, "Usage: %s {car name} {floor} {up|down}\n", argv[0]);
         return 1;
     }
