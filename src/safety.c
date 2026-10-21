@@ -1,13 +1,4 @@
 /* 
- * safety.c - safety monitor for one elevator car: ./safety {car name}
- *
- * Build: gcc -std=gnu11 -O2 -pthread -Wall -Wextra -Wpedantic -Wconversion \
- *            -Wsign-conversion -Wshadow -Wcast-qual -o safety safety.c
- *
- * DEVIATIONS (MISRA C:2012 / safety-critical guidance)
- *
- * 
- *
  * D1  Rule 21.5  signal.h used (sigaction, sig_atomic_t, SIGINT).
  *     Needed to stop cleanly on SIGINT (unlock, unmap). The handler only
  *     stores 0 into a volatile sig_atomic_t; all other work is in normal
@@ -50,6 +41,12 @@
  */
 
 // for the record i abhor misra
+
+
+
+
+
+
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
